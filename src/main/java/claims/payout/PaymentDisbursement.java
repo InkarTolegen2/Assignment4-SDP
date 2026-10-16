@@ -12,6 +12,9 @@ public class PaymentDisbursement {
     }
 
     public void disburse(String claimId, long amount) {
+        if (repository.findStatus(claimId).filter("PAID"::equals).isPresent()) {
+            return;   // already paid, do not pay twice
+        }
         if (!bank.transfer(claimId, amount)) {
             throw new PayoutFailedException("Bank declined payout for " + claimId);
         }
